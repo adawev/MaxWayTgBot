@@ -1,5 +1,8 @@
 package diyor.adashev;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.xssf.usermodel.*;
 import org.telegram.telegrambots.meta.api.methods.send.SendLocation;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -11,8 +14,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.webapp.WebAppInfo;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static diyor.adashev.MyBot.userList;
 
 public class MyBotService {
     public SendMessage sendMessage(Long chatId){
@@ -2755,4 +2762,47 @@ public class MyBotService {
         return sendMessage;
     }
 
+
+    public static void saveExcel(String firstName, String lastName, Long chatId, String text){
+        XSSFWorkbook sheets = new XSSFWorkbook();
+
+        XSSFSheet xssfSheet = sheets.createSheet("Data");
+        XSSFRow row = xssfSheet.createRow(0);
+        XSSFCellStyle cellStyle = sheets.createCellStyle();
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+
+        XSSFCell cell = row.createCell(0, Cell.CELL_TYPE_STRING);
+        cell.setCellValue("firstName");
+        cell.setCellStyle(cellStyle);
+
+        XSSFCell cell1 = row.createCell(1, Cell.CELL_TYPE_STRING);
+        cell1.setCellValue("lastName");
+        cell1.setCellStyle(cellStyle);
+
+        XSSFCell cell2 = row.createCell(2, Cell.CELL_TYPE_STRING);
+        cell2.setCellValue("chatId");
+        cell2.setCellStyle(cellStyle);
+
+        XSSFCell cell3 = row.createCell(3, Cell.CELL_TYPE_STRING);
+        cell3.setCellValue("text");
+        cell3.setCellStyle(cellStyle);
+
+        int i=1;
+
+        for (User use: userList){
+            XSSFRow row1 = xssfSheet.createRow(i++);
+            row1.createCell(0, Cell.CELL_TYPE_STRING).setCellValue(use.getFirstName());
+            row1.createCell(1, Cell.CELL_TYPE_STRING).setCellValue(use.getLastName());
+            row1.createCell(2, Cell.CELL_TYPE_NUMERIC).setCellValue(use.getChatId());
+            row1.createCell(3, Cell.CELL_TYPE_STRING).setCellValue(use.getText());
+        }
+
+        try {
+            sheets.write(new FileOutputStream("D:\\data_Maxway.xlsx"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
 }

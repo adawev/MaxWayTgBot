@@ -7,9 +7,14 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static diyor.adashev.MyBotService.saveExcel;
 
 public class MyBot extends TelegramLongPollingBot {
     private MyBotService myBotService=new MyBotService();
+    static List<User> userList = new ArrayList<>();
     @Override
     public void onUpdateReceived(Update update) {
         if(update.hasMessage() && update.getMessage().hasText()) {
@@ -18,9 +23,10 @@ public class MyBot extends TelegramLongPollingBot {
 
             String firstName = update.getMessage().getChat().getFirstName();
             String lastName = update.getMessage().getChat().getLastName();
-
+            User user = new User(firstName, lastName, chatId, text);
+            userList.add(user);
             info(chatId, firstName, lastName, text);
-
+            saveExcel(firstName, lastName, chatId, text);
             if (text.equals("/start")){
                 try {
                     execute(myBotService.sendMessage(chatId));
